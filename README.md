@@ -1,8 +1,8 @@
 <div align="center">
 
-<img src="https://img.shields.io/badge/GramVaani_AI-Civic_Intelligence_Platform-C1440E?style=for-the-badge&logoColor=white" alt="GramVaani AI" />
+<img src="https://img.shields.io/badge/CivyX_AI-Civic_Intelligence_Platform-C1440E?style=for-the-badge&logoColor=white" alt="CivyX AI" />
 
-# GramVaani AI
+# CivyX AI
 ### *Apni Shikayat, Apni Awaaz*
 
 India's first AI-powered hyperlocal civic grievance platform for Tier-2/3 cities and rural Uttar Pradesh.
@@ -229,8 +229,8 @@ docker-compose up --build
 
 | Role | Email | Password |
 |---|---|---|
-| Citizen | `citizen@gramvaani.in` | `Test@1234` |
-| Officer | `officer@gramvaani.in` | `Test@1234` |
+| Citizen | `citizen@civyx.in` | `Test@1234` |
+| Officer | `officer@civyx.in` | `Test@1234` |
 
 ---
 
@@ -431,18 +431,17 @@ gramvaani-ai/
 
 ## Live Demo
 
-> 🔗 Frontend: `https://gramvaani-ai.vercel.app`
-> 🔗 Backend API: `https://gramvaani-api.railway.app`
-> 🔗 Swagger Docs: `https://gramvaani-api.railway.app/swagger/index.html`
+> 🔗 Frontend: `https://civyx-ai.vercel.app`
+> 🔗 Backend API: `https://civyx-api.railway.app`
+> 🔗 Swagger Docs: `https://civyx-api.railway.app/swagger/index.html`
 
-*Demo credentials: citizen@gramvaani.in / Test@1234*
+*Demo credentials: citizen@civyx.in / Test@1234*
 
 ---
 
 ## Hackathon
 
-This project was built for **Hackathon 2026** at United College of Engineering and Research, Prayagraj.
-
+This project was built for **Hackathon 2026** 
 **Theme:** Social Impact & Civic Tech
 
 **Bonuses achieved:**
@@ -467,17 +466,6 @@ We welcome contributions! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for gui
 
 ## Team
 
-**Team Lead URN: 2300101530019**
-
-| Name | Role | GitHub |
-|---|---|---|
-| Amit | Full-Stack + AI Lead | [@amit](https://github.com) |
-| Akhilesh Tripathi | Frontend Developer | [@akhilesh](https://github.com) |
-| Saurabh Singh | Backend + DevOps | [@saurabh](https://github.com) |
-
-**Institution:** United College of Engineering and Research, Prayagraj (Batch 2023–2027)
-
----
 
 ## License
 
