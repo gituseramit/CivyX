@@ -23,7 +23,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
           <!-- Header -->
           <div class="text-center mb-10 relative z-10">
             <div class="inline-flex items-center justify-center w-16 h-16 rounded-xl bg-primary/10 border border-primary/20 mb-6 glow-cyan">
-               <span class="material-symbols-outlined text-primary text-3xl" style="font-variation-settings: 'FILL' 1">person_add</span>
+               <mat-icon class="text-primary text-3xl">person_add</mat-icon>
             </div>
             <h1 class="display-sm mb-3">Establish <span class="text-primary italic">Identity</span></h1>
             <p class="label-md tracking-[0.25em]">Civic Network Registration</p>

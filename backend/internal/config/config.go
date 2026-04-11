@@ -14,6 +14,8 @@ type Config struct {
 	JWTSecret     string
 	GroqAPIKey    string
 	SarvamAPIKey  string
+	AdminEmail    string
+	AdminPassword string
 }
 
 var App Config
@@ -29,6 +31,8 @@ func Load() {
 		JWTSecret:    getEnv("JWT_SECRET", "change_this_secret_in_production"),
 		GroqAPIKey:   getEnv("GROQ_API_KEY", ""),
 		SarvamAPIKey: getEnv("SARVAM_API_KEY", ""),
+		AdminEmail:   getEnv("ADMIN_EMAIL", "superadmin@civyx.gov.in"),
+		AdminPassword: getEnv("ADMIN_PASSWORD", "SuperSecureAdmin2026!"),
 	}
 
 	if App.GroqAPIKey == "" {

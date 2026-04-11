@@ -49,10 +49,9 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
             <button (click)="toggleRecording()" 
                     class="relative w-32 h-32 rounded-full mic-gradient border-4 border-white/5 glow-cyan flex items-center justify-center transition-all duration-500 hover:scale-105 active:scale-95 cursor-pointer"
                     [ngClass]="{'recording': voice.isRecording}">
-              <span class="material-symbols-outlined text-4xl text-[#003642]" 
-                    [style.font-variation-settings]="fontVar">
+              <mat-icon class="text-4xl text-[#003642]">
                 {{ voice.isRecording ? 'stop' : 'mic' }}
-              </span>
+              </mat-icon>
             </button>
           </div>
 
@@ -97,6 +96,35 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
           </div>
         </div>
 
+        <!-- Transparency Data Streams -->
+        <div class="w-full max-w-5xl mb-24 reveal-slow">
+           <div class="flex items-center gap-3 mb-8">
+              <span class="w-12 h-px bg-primary/20"></span>
+              <span class="label-md !text-[9px] text-white/40 uppercase tracking-[0.4em] font-black">Public Transparency Protocol</span>
+           </div>
+           
+           <div class="grid grid-cols-1 sm:grid-cols-2 gap-8">
+              <a routerLink="/public-feed" class="institutional-glass p-8 rounded-2xl border border-white/5 hover:border-primary/40 transition-all group flex items-start gap-6">
+                 <div class="w-14 h-14 rounded-xl bg-primary/5 border border-primary/20 flex items-center justify-center shrink-0 group-hover:bg-primary group-hover:text-[#061425] transition-all">
+                    <mat-icon class="!text-3xl">sensors</mat-icon>
+                 </div>
+                 <div>
+                    <h4 class="text-xl font-black text-white group-hover:text-primary mb-2 transition-all">Civic Pulse</h4>
+                    <p class="text-xs text-dim leading-relaxed italic">Live anonymized intelligence stream of municipal grievances and resolutions.</p>
+                 </div>
+              </a>
+
+              <a routerLink="/leaderboard" class="institutional-glass p-8 rounded-2xl border border-white/5 hover:border-amber-500/40 transition-all group flex items-start gap-6">
+                 <div class="w-14 h-14 rounded-xl bg-amber-500/5 border border-amber-500/20 flex items-center justify-center shrink-0 group-hover:bg-amber-500 group-hover:text-[#061425] transition-all text-amber-500">
+                    <mat-icon class="!text-3xl">workspace_premium</mat-icon>
+                 </div>
+                 <div>
+                    <h4 class="text-xl font-black text-white group-hover:text-amber-500 mb-2 transition-all">Officer Merit Matrix</h4>
+                    <p class="text-xs text-dim leading-relaxed italic">Public ranking of departmental efficiency and resolution velocity metrics.</p>
+                 </div>
+              </a>
+           </div>
+        </div>
       </main>
     </div>
   `,

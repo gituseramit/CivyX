@@ -21,6 +21,7 @@ interface AuthResponse {
 export class AuthService {
   private readonly TOKEN_KEY = 'civyx_token';
   private readonly USER_KEY  = 'civyx_user';
+  readonly apiUrl = '/api';
 
   // Reactive signals
   currentUser = signal<User | null>(this.loadUser());
@@ -35,9 +36,23 @@ export class AuthService {
       .pipe(tap(res => this.persist(res)));
   }
 
-  login(email: string, password: string): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>('/api/auth/login', { email, password })
-      .pipe(tap(res => this.persist(res)));
+  login(email: string, password: string): Observable<any> {
+    return this.http.post('/api/auth/login', { email, password }).pipe(
+      tap((res: any) => this.persist(res))
+    );
+  }
+
+  adminLogin(admin_id: string, password: string, otp?: string): Observable<any> {
+    const payload: any = { admin_id, password };
+    if (otp) payload.otp = otp;
+    return this.http.post('/api/admin/login', payload);
+  }
+
+  adminLogout(): void {
+    localStorage.removeItem(this.TOKEN_KEY);
+    localStorage.removeItem(this.USER_KEY);
+    this.currentUser.set(null);
+    this.router.navigate(['/admin/login']);
   }
 
   logout(): void {

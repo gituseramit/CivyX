@@ -18,11 +18,18 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(request).pipe(
     catchError((error: HttpErrorResponse) => {
-      if (error.status === 401) {
-        // Clear session and redirect to login
-        auth.logout();
-        const currentUrl = router.url;
-        router.navigate(['/login'], { queryParams: { returnUrl: currentUrl } });
+      // Do not intercept 401s for login routes, let components handle them natively to show error messages
+      if (error.status === 401 && !req.url.includes('/login')) {
+        localStorage.removeItem('civyx_token');
+        localStorage.removeItem('civyx_user');
+        
+        // Route to the appropriate login based on the URL
+        if (req.url.includes('/admin/')) {
+          router.navigate(['/admin/login']);
+        } else {
+          const currentUrl = router.url;
+          router.navigate(['/login'], { queryParams: { returnUrl: currentUrl } });
+        }
       }
       return throwError(() => error);
     })

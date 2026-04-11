@@ -10,9 +10,10 @@ import (
 )
 
 type Claims struct {
-	UserID string `json:"user_id"`
-	Email  string `json:"email"`
-	Role   string `json:"role"`
+	UserID    string `json:"user_id"`
+	Email     string `json:"email"`
+	Role      string `json:"role"`
+	AdminRole string `json:"admin_role,omitempty"`
 	jwt.RegisteredClaims
 }
 
@@ -41,18 +42,49 @@ func Protected() fiber.Handler {
 		c.Locals("user_id", claims.UserID)
 		c.Locals("email", claims.Email)
 		c.Locals("role", claims.Role)
+		c.Locals("admin_role", claims.AdminRole)
 
 		return c.Next()
 	}
 }
 
-// RequireRole returns a middleware that checks for a specific role after Protected().
+// RequireRole returns a middleware that checks for a specific role.
 func RequireRole(role string) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		userRole, ok := c.Locals("role").(string)
-		if !ok || userRole != role {
+		userRole, _ := c.Locals("role").(string)
+		if userRole == "admin" {
+			// Admins bypass role checks for citizen/officer routes, 
+			// but must be checked for specific admin sub-roles.
+			return c.Next()
+		}
+		if userRole != role {
 			return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"error": "insufficient permissions"})
 		}
 		return c.Next()
+	}
+}
+
+// RequireAdminRole checks for specific admin sub-roles (super_admin, district_admin, etc.)
+func RequireAdminRole(adminRoles ...string) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		userRole, _ := c.Locals("role").(string)
+		adminRole, _ := c.Locals("admin_role").(string)
+
+		if userRole != "admin" {
+			return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"error": "admin access required"})
+		}
+
+		// Super Admin always has access
+		if adminRole == "super_admin" {
+			return c.Next()
+		}
+
+		for _, r := range adminRoles {
+			if adminRole == r {
+				return c.Next()
+			}
+		}
+
+		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"error": "insufficient admin privileges"})
 	}
 }
