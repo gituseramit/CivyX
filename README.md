@@ -49,7 +49,7 @@ Voice complaints in Hindi. AI-classified. Officer-tracked. Ward health scored.
 
 ## About the Project
 
-GramVaani AI transforms how citizens in Uttar Pradesh report and track civic grievances. Instead of visiting a government office or filling a complex online form, a citizen speaks their complaint in Hindi, Awadhi, or Bhojpuri. The platform:
+CivyX AI transforms how citizens in Uttar Pradesh report and track civic grievances. Instead of visiting a government office or filling a complex online form, a citizen speaks their complaint in Hindi, Awadhi, or Bhojpuri. The platform:
 
 1. **Transcribes** the voice using Sarvam AI (22 Indian languages supported)
 2. **Classifies** the complaint using Groq LLM — category, severity, department — in milliseconds
