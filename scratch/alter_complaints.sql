@@ -1,0 +1,1 @@
+ALTER TABLE complaints ADD COLUMN is_escalated BOOLEAN DEFAULT FALSE;

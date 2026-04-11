@@ -31,8 +31,24 @@ export class AuthService {
 
   constructor(private http: HttpClient, private router: Router) {}
 
-  register(name: string, email: string, password: string, role: string, wardId?: string): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>('/api/auth/register', { name, email, password, role, ward_id: wardId })
+  register(
+    name: string, 
+    email: string, 
+    password: string, 
+    role: string, 
+    extra?: { wardId?: string, employeeId?: string, designation?: string, department?: string }
+  ): Observable<AuthResponse> {
+    const payload = { 
+      name, 
+      email, 
+      password, 
+      role, 
+      ward_id: extra?.wardId,
+      employee_id: extra?.employeeId,
+      designation: extra?.designation,
+      department_name: extra?.department
+    };
+    return this.http.post<AuthResponse>('/api/auth/register', payload)
       .pipe(tap(res => this.persist(res)));
   }
 

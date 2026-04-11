@@ -1,0 +1,2 @@
+ALTER TABLE users ADD COLUMN verification_status TEXT DEFAULT 'APPROVED';
+ALTER TABLE users ADD COLUMN admin_role TEXT;

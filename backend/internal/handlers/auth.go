@@ -13,11 +13,14 @@ import (
 )
 
 type registerInput struct {
-	Name     string `json:"name"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
-	Role     string `json:"role"` // "citizen" or "officer"
-	WardID   string `json:"ward_id,omitempty"`
+	Name           string `json:"name"`
+	Email          string `json:"email"`
+	Password       string `json:"password"`
+	Role           string `json:"role"` // "citizen" or "officer"
+	WardID         string `json:"ward_id,omitempty"`
+	EmployeeID     string `json:"employee_id,omitempty"`
+	Designation    string `json:"designation,omitempty"`
+	DepartmentName string `json:"department_name,omitempty"`
 }
 
 type loginInput struct {
@@ -57,9 +60,15 @@ func Register(c *fiber.Ctx) error {
 		status = "PENDING"
 	}
 
-	err = db.Pool.QueryRow(ctx,
-		`INSERT INTO users (name, email, password_hash, role, ward_id, verification_status) VALUES ($1,$2,$3,$4,$5,$6) RETURNING id`,
+	query := `
+		INSERT INTO users (
+			name, email, password_hash, role, ward_id, verification_status, 
+			employee_id, designation, department_name
+		) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING id`
+
+	err = db.Pool.QueryRow(ctx, query,
 		input.Name, input.Email, string(hash), input.Role, wardID, status,
+		input.EmployeeID, input.Designation, input.DepartmentName,
 	).Scan(&userID)
 
 	if err != nil {

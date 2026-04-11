@@ -2,11 +2,9 @@ import { Component, OnInit, AfterViewInit, signal, ElementRef, ViewChild } from 
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { WardService, Ward } from '../../core/services/ward.service';
-import { ComplaintService } from '../../core/services/complaint.service';
 import * as L from 'leaflet';
 import { MatIconModule } from '@angular/material/icon';
 import { Chart, registerables } from 'chart.js';
-
 
 Chart.register(...registerables);
 
@@ -98,16 +96,6 @@ Chart.register(...registerables);
 
       <!-- Matrix Container (Map) -->
       <div id="map" class="flex-1 relative bg-[#04080e]">
-         <div class="absolute inset-0 bg-primary/5 pointer-events-none z-[40]"></div>
-         
-         <div class="absolute top-8 left-8 z-[100] flex flex-col gap-4">
-           <button (click)="toggleHeatmap()" class="btn-ghost !py-2.5 !px-5 !text-[9px] flex items-center gap-3" 
-                   [ngClass]="{'bg-primary/20 border-primary/40': heatmapEnabled()}">
-             <mat-icon class="text-xs">{{ heatmapEnabled() ? 'visibility' : 'local_fire_department' }}</mat-icon>
-             {{ heatmapEnabled() ? 'DISABLE HEATMAP' : 'ACTIVATE SEVERITY HEATMAP' }}
-           </button>
-         </div>
-
          <a routerLink="/" class="absolute top-8 right-8 z-[100] btn-ghost !py-2.5 !px-5 !text-[9px] flex items-center gap-3">
            <mat-icon class="text-sm">arrow_back</mat-icon> DISCONNECT MATRIX
          </a>
@@ -116,9 +104,7 @@ Chart.register(...registerables);
   `,
   styles: [`
     #map { z-index: 10; }
-    :host ::ng-deep .map-tiles {
-       filter: brightness(0.4) invert(1) contrast(3) hue-rotate(170deg) saturate(0.3) brightness(1.2) !important;
-    }
+
     :host ::ng-deep .leaflet-container {
        background: #061425 !important;
     }
@@ -133,13 +119,11 @@ export class WardMapComponent implements OnInit, AfterViewInit {
   private map!: L.Map;
   selectedWard = signal<Ward | null>(null);
   wardStats = signal<any>(null);
-  heatmapEnabled = signal<boolean>(false);
-  private heatLayer: any = null;
   
   @ViewChild('chartCanvas') chartCanvas!: ElementRef<HTMLCanvasElement>;
   private chart: Chart | null = null;
 
-  constructor(private wardService: WardService, private complaintSvc: ComplaintService) {}
+  constructor(private wardService: WardService) {}
 
   ngOnInit() {}
 
@@ -150,16 +134,17 @@ export class WardMapComponent implements OnInit, AfterViewInit {
 
   private initMap() {
     this.map = L.map('map', {
-      center: [12.9716, 77.5946],
+      center: [28.6139, 77.2090],
       zoom: 13,
       zoomControl: false
     });
 
     L.control.zoom({ position: 'bottomright' }).addTo(this.map);
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap contributors',
-      className: 'map-tiles'
+    L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+      maxZoom: 20,
+      subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+      attribution: '© Google'
     }).addTo(this.map);
   }
 
@@ -179,29 +164,6 @@ export class WardMapComponent implements OnInit, AfterViewInit {
         });
       });
     });
-  }
-
-  toggleHeatmap() {
-    this.heatmapEnabled.set(!this.heatmapEnabled());
-    if (this.heatmapEnabled()) {
-      this.complaintSvc.list().subscribe(complaints => {
-        const heatPoints = complaints
-          .filter(c => c.lat && c.lng)
-          .map(c => [c.lat, c.lng, c.severity * 0.2]); // intensity based on severity
-        
-        this.heatLayer = (L as any).heatLayer(heatPoints, {
-          radius: 25,
-          blur: 15,
-          maxZoom: 10,
-          gradient: { 0.4: 'blue', 0.65: 'lime', 1: 'red' }
-        }).addTo(this.map);
-      });
-    } else {
-      if (this.heatLayer) {
-        this.map.removeLayer(this.heatLayer);
-        this.heatLayer = null;
-      }
-    }
   }
 
   private onWardClick(ward: Ward) {
