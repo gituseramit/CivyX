@@ -15,7 +15,7 @@ import { MatIconModule } from '@angular/material/icon';
         <!-- Brand Identity -->
         <div class="flex items-center gap-4 cursor-pointer" routerLink="/">
           <div class="w-10 h-10 rounded bg-primary/10 border border-primary/20 flex items-center justify-center glow-cyan">
-             <span class="material-symbols-outlined text-primary text-2xl" style="font-variation-settings: 'FILL' 1">shield_with_heart</span>
+             <mat-icon class="text-primary text-2xl">security</mat-icon>
           </div>
           <div class="flex flex-col">
             <span class="text-lg font-black tracking-tight text-white leading-none">CivyX <span class="text-primary italic">AI</span></span>

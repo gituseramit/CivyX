@@ -52,16 +52,21 @@ func Register(c *fiber.Ctx) error {
 		wardID = &input.WardID
 	}
 
+	var status = "APPROVED"
+	if input.Role == "officer" {
+		status = "PENDING"
+	}
+
 	err = db.Pool.QueryRow(ctx,
-		`INSERT INTO users (name, email, password_hash, role, ward_id) VALUES ($1,$2,$3,$4,$5) RETURNING id`,
-		input.Name, input.Email, string(hash), input.Role, wardID,
+		`INSERT INTO users (name, email, password_hash, role, ward_id, verification_status) VALUES ($1,$2,$3,$4,$5,$6) RETURNING id`,
+		input.Name, input.Email, string(hash), input.Role, wardID, status,
 	).Scan(&userID)
 
 	if err != nil {
 		return c.Status(409).JSON(fiber.Map{"error": "email already registered"})
 	}
 
-	token, err := generateToken(userID, input.Email, input.Role)
+	token, err := generateToken(userID, input.Email, input.Role, "")
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "failed to generate token"})
 	}
@@ -87,29 +92,44 @@ func Login(c *fiber.Ctx) error {
 		name     string
 		role     string
 		passhash string
+		aRole    *string
+		status   string
 	)
 
 	err := db.Pool.QueryRow(ctx,
-		`SELECT id, name, role, password_hash FROM users WHERE email = $1`,
+		`SELECT id, name, role, password_hash, admin_role, verification_status FROM users WHERE email = $1`,
 		input.Email,
-	).Scan(&userID, &name, &role, &passhash)
+	).Scan(&userID, &name, &role, &passhash, &aRole, &status)
 
 	if err != nil {
 		return c.Status(401).JSON(fiber.Map{"error": "invalid credentials"})
+	}
+
+	if role == "officer" && status == "PENDING" {
+		return c.Status(403).JSON(fiber.Map{"error": "account pending government verification"})
+	}
+
+	if role == "officer" && status == "SUSPENDED" {
+		return c.Status(403).JSON(fiber.Map{"error": "account suspended by administration"})
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(passhash), []byte(input.Password)); err != nil {
 		return c.Status(401).JSON(fiber.Map{"error": "invalid credentials"})
 	}
 
-	token, err := generateToken(userID, input.Email, role)
+	adminRole := ""
+	if aRole != nil {
+		adminRole = *aRole
+	}
+
+	token, err := generateToken(userID, input.Email, role, adminRole)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "failed to generate token"})
 	}
 
 	return c.JSON(fiber.Map{
 		"token": token,
-		"user":  fiber.Map{"id": userID, "name": name, "email": input.Email, "role": role},
+		"user":  fiber.Map{"id": userID, "name": name, "email": input.Email, "role": role, "admin_role": adminRole},
 	})
 }
 
@@ -147,13 +167,79 @@ func Me(c *fiber.Ctx) error {
 	})
 }
 
-func generateToken(userID, email, role string) (string, error) {
+// AdminLogin — POST /api/admin/login
+func AdminLogin(c *fiber.Ctx) error {
+	var input struct {
+		AdminID  string `json:"admin_id"` // email
+		Password string `json:"password"`
+		OTP      string `json:"otp"`
+	}
+	if err := c.BodyParser(&input); err != nil {
+		return c.Status(400).JSON(fiber.Map{"error": "invalid request body"})
+	}
+
+	// 1. Check if it's the Super Admin from Env
+	if input.AdminID == config.App.AdminEmail && input.Password == config.App.AdminPassword {
+		// Mock 2FA for Demo
+		if input.OTP == "" {
+			return c.Status(200).JSON(fiber.Map{"message": "2FA_REQUIRED", "otp_sent_to": input.AdminID})
+		}
+		if input.OTP != "123456" {
+			return c.Status(401).JSON(fiber.Map{"error": "invalid 2FA code"})
+		}
+
+		token, _ := generateToken("SUPER_ADMIN_ID", input.AdminID, "admin", "super_admin")
+		return c.JSON(fiber.Map{
+			"token": token,
+			"user":  fiber.Map{"id": "SUPER_ADMIN", "name": "Institutional Super Admin", "email": input.AdminID, "role": "admin", "admin_role": "super_admin"},
+		})
+	}
+
+	// 2. Check Database for other admin roles
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	var (
+		userID    string
+		name      string
+		role      string
+		adminRole string
+		passhash  string
+	)
+
+	err := db.Pool.QueryRow(ctx,
+		`SELECT id, name, role, admin_role, password_hash FROM users WHERE email = $1 AND role = 'admin'`,
+		input.AdminID,
+	).Scan(&userID, &name, &role, &adminRole, &passhash)
+
+	if err != nil {
+		return c.Status(401).JSON(fiber.Map{"error": "unauthorized admin portal access"})
+	}
+
+	if err := bcrypt.CompareHashAndPassword([]byte(passhash), []byte(input.Password)); err != nil {
+		return c.Status(401).JSON(fiber.Map{"error": "invalid credentials"})
+	}
+
+	// Mock 2FA for other admins too
+	if input.OTP != "123456" {
+		return c.Status(200).JSON(fiber.Map{"message": "2FA_REQUIRED", "otp_sent_to": input.AdminID})
+	}
+
+	token, _ := generateToken(userID, input.AdminID, role, adminRole)
+	return c.JSON(fiber.Map{
+		"token": token,
+		"user":  fiber.Map{"id": userID, "name": name, "email": input.AdminID, "role": role, "admin_role": adminRole},
+	})
+}
+
+func generateToken(userID, email, role, adminRole string) (string, error) {
 	claims := jwt.MapClaims{
-		"user_id": userID,
-		"email":   email,
-		"role":    role,
-		"exp":     time.Now().Add(72 * time.Hour).Unix(),
-		"iat":     time.Now().Unix(),
+		"user_id":    userID,
+		"email":      email,
+		"role":       role,
+		"admin_role": adminRole,
+		"exp":        time.Now().Add(72 * time.Hour).Unix(),
+		"iat":        time.Now().Unix(),
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString([]byte(config.App.JWTSecret))

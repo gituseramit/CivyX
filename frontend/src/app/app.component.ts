@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { NavbarComponent } from './shared/components/navbar/navbar.component';
 
 @Component({
@@ -8,7 +8,9 @@ import { NavbarComponent } from './shared/components/navbar/navbar.component';
   imports: [RouterOutlet, NavbarComponent],
   template: `
     <!-- Top Nav Overlay -->
-    <app-navbar></app-navbar>
+    @if (!isAdminRoute) {
+      <app-navbar></app-navbar>
+    }
 
     <!-- Main Content Stage -->
     <main class="relative min-h-screen">
@@ -42,4 +44,14 @@ import { NavbarComponent } from './shared/components/navbar/navbar.component';
 })
 export class AppComponent {
   title = 'civyx-frontend';
+  isAdminRoute = false;
+
+  constructor(private router: Router) {
+    this.router.events.subscribe((event) => {
+      if (event instanceof NavigationEnd) {
+        this.isAdminRoute = event.urlAfterRedirects.startsWith('/admin');
+      }
+    });
+  }
 }
+

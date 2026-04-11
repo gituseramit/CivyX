@@ -1,0 +1,1 @@
+import{_ as i,da as e,zc as s}from"./chunk-CRR7U3A6.js";var c=(()=>{class t{constructor(r){this.http=r}list(){return this.http.get("/api/wards")}getStats(r){return this.http.get(`/api/wards/${r}/stats`)}static{this.\u0275fac=function(a){return new(a||t)(e(s))}}static{this.\u0275prov=i({token:t,factory:t.\u0275fac,providedIn:"root"})}}return t})();export{c as a};
