@@ -8,12 +8,13 @@ import (
 )
 
 type Config struct {
-	Port          string
-	DBURL         string
-	RedisURL      string
-	JWTSecret     string
-	GroqAPIKey    string
-	SarvamAPIKey  string
+	Port             string
+	DBURL            string
+	RedisURL         string
+	JWTSecret        string
+	GroqAPIKey       string
+	SarvamAPIKey     string
+	GoogleMapsAPIKey string
 }
 
 var App Config
@@ -23,12 +24,13 @@ func Load() {
 	_ = godotenv.Load()
 
 	App = Config{
-		Port:         getEnv("PORT", "8080"),
-		DBURL:        getEnv("DB_URL", "postgres://gramvaani:gramvaani123@localhost:5432/gramvaani"),
-		RedisURL:     getEnv("REDIS_URL", "redis://localhost:6379"),
-		JWTSecret:    getEnv("JWT_SECRET", "change_this_secret_in_production"),
-		GroqAPIKey:   getEnv("GROQ_API_KEY", ""),
-		SarvamAPIKey: getEnv("SARVAM_API_KEY", ""),
+		Port:             getEnv("PORT", "8080"),
+		DBURL:            getEnv("DB_URL", "postgres://gramvaani:gramvaani123@localhost:5432/gramvaani"),
+		RedisURL:         getEnv("REDIS_URL", "redis://localhost:6379"),
+		JWTSecret:        getEnv("JWT_SECRET", "change_this_secret_in_production"),
+		GroqAPIKey:       getEnv("GROQ_API_KEY", ""),
+		SarvamAPIKey:     getEnv("SARVAM_API_KEY", ""),
+		GoogleMapsAPIKey: getEnv("GOOGLE_MAPS_API_KEY", ""),
 	}
 
 	if App.GroqAPIKey == "" {
@@ -36,6 +38,9 @@ func Load() {
 	}
 	if App.SarvamAPIKey == "" {
 		log.Println("[WARN] SARVAM_API_KEY is not set. Voice-to-text will be skipped.")
+	}
+	if App.GoogleMapsAPIKey == "" {
+		log.Println("[WARN] GOOGLE_MAPS_API_KEY is not set. Map features may be limited.")
 	}
 }
 
