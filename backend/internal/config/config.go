@@ -8,7 +8,6 @@ import (
 )
 
 type Config struct {
-<<<<<<< HEAD
 	Port             string
 	DBURL            string
 	RedisURL         string
@@ -16,16 +15,8 @@ type Config struct {
 	GroqAPIKey       string
 	SarvamAPIKey     string
 	GoogleMapsAPIKey string
-=======
-	Port          string
-	DBURL         string
-	RedisURL      string
-	JWTSecret     string
-	GroqAPIKey    string
-	SarvamAPIKey  string
-	AdminEmail    string
-	AdminPassword string
->>>>>>> fd3dcb588fa03d9cf44b5f4a2346b159f5f8b4d5
+	AdminEmail       string
+	AdminPassword    string
 }
 
 var App Config
@@ -35,7 +26,6 @@ func Load() {
 	_ = godotenv.Load()
 
 	App = Config{
-<<<<<<< HEAD
 		Port:             getEnv("PORT", "8080"),
 		DBURL:            getEnv("DB_URL", "postgres://gramvaani:gramvaani123@localhost:5432/gramvaani"),
 		RedisURL:         getEnv("REDIS_URL", "redis://localhost:6379"),
@@ -43,16 +33,8 @@ func Load() {
 		GroqAPIKey:       getEnv("GROQ_API_KEY", ""),
 		SarvamAPIKey:     getEnv("SARVAM_API_KEY", ""),
 		GoogleMapsAPIKey: getEnv("GOOGLE_MAPS_API_KEY", ""),
-=======
-		Port:         getEnv("PORT", "8080"),
-		DBURL:        getEnv("DB_URL", "postgres://gramvaani:gramvaani123@localhost:5432/gramvaani"),
-		RedisURL:     getEnv("REDIS_URL", "redis://localhost:6379"),
-		JWTSecret:    getEnv("JWT_SECRET", "change_this_secret_in_production"),
-		GroqAPIKey:   getEnv("GROQ_API_KEY", ""),
-		SarvamAPIKey: getEnv("SARVAM_API_KEY", ""),
-		AdminEmail:   getEnv("ADMIN_EMAIL", "superadmin@civyx.gov.in"),
-		AdminPassword: getEnv("ADMIN_PASSWORD", "SuperSecureAdmin2026!"),
->>>>>>> fd3dcb588fa03d9cf44b5f4a2346b159f5f8b4d5
+		AdminEmail:       getEnv("ADMIN_EMAIL", "superadmin@civyx.gov.in"),
+		AdminPassword:    getEnv("ADMIN_PASSWORD", "SuperSecureAdmin2026!"),
 	}
 
 	if App.GroqAPIKey == "" {
